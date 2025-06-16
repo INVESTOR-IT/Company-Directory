@@ -1,22 +1,25 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
+from typing import Annotated
 
+from app.api.request_model import SearchCircle, SearchRectangle
 
 router = APIRouter()
 
 
-@router.get('/organizations_using_house/{house}', tags=['Organizations'])
-async def get_organizations_using_house(house: str) -> list:
+@router.get('/organizations_using_house/{house_id}', tags=['Organizations'])
+async def get_organizations_using_house(house_id: int) -> list:
     ...
 
 
-@router.get('/organizations_using_activity/{activity}', tags=['Organizations'])
-async def get_organizations_using_activity(activity: str) -> list:
+@router.get('/organizations_using_activity/{activity_id}', tags=['Organizations'])
+async def get_organizations_using_activity(activity_id: int) -> list:
     ...
 
 
 @router.get('/organizations_using_coordinate/', tags=['Organizations'])
-async def get_organizations_using_coordinate(сentre: float,
-                                             edge: float) -> list:
+async def get_organizations_using_coordinate(
+        cerch_params: Annotated[SearchCircle | SearchRectangle, Body()]
+) -> list:
     ...
 
 
