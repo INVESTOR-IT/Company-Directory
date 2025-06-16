@@ -1,4 +1,5 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import String
 
 
 class Base(DeclarativeBase):
@@ -8,10 +9,45 @@ class Base(DeclarativeBase):
 class Organizations(Base):
     __tablename__ = 'Organizations'
 
+    names: Mapped[str] = mapped_column(String(50), nullable=False)
+    phones: Mapped[str] = mapped_column(String(75), nullable=False)
+    hauses: Mapped[int] = mapped_column(nullable=False)
+    activities: Mapped[int] = mapped_column(nullable=False)
+
+    houses: Mapped['Houses'] = relationship(back_populates='organizations')
+    activities: Mapped['Activities'] = relationship(back_populates='organizations')
+
+    def __repr__(self):
+        return (f'Organizations(id={self.id!r}, '
+                f'name={self.names!r}, '
+                f'hause={self.hauses!r}, '
+                f'activity={self.activities!r})')
+
 
 class Houses(Base):
     __tablename__ = 'Houses'
 
+    address: Mapped[str] = mapped_column(String(50), nullable=False)
+    coordinates: Mapped[str] = mapped_column(String(30), nullable=False)
+
+    organizations: Mapped[list[Organizations]] = relationship(back_populates='houses')
+
+    def __repr__(self):
+        return (f'Houses(id={self.id!r}, '
+                f'address={self.address!r}, '
+                f'coordinates={self.coordinates!r}')
+
 
 class Activities(Base):
     __tablename__ = 'Activities'
+
+    names: Mapped[str] = mapped_column(String(50), nullable=False)
+    parent_id: Mapped[int] = mapped_column(nullable=False)
+
+    organizations: Mapped[Organizations] = relationship(back_populates='activities')
+    parent = relationship("Activity", remote_side=[id])
+
+    def __repr__(self):
+        return (f'Activities(id={self.id!r}, '
+                f'name={self.names!r}, '
+                f'parent_id={self.parent_id!r})')
