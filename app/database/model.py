@@ -1,5 +1,5 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy import String
+from sqlalchemy import String, ForeignKey
 
 
 class Base(DeclarativeBase):
@@ -11,11 +11,11 @@ class Organizations(Base):
 
     names: Mapped[str] = mapped_column(String(50), nullable=False)
     phones: Mapped[str] = mapped_column(String(75), nullable=False)
-    hauses: Mapped[int] = mapped_column(nullable=False)
-    activities: Mapped[int] = mapped_column(nullable=False)
+    hauses_id: Mapped[int] = mapped_column(ForeignKey('Houses.id'), nullable=False)
+    activities_id: Mapped[int] = mapped_column(ForeignKey('Activities.id'), nullable=False)
 
-    houses: Mapped['Houses'] = relationship(back_populates='organizations')
-    activities: Mapped['Activities'] = relationship(back_populates='organizations')
+    houses: Mapped['Houses'] = relationship('Houses', back_populates='organizations')
+    activities: Mapped['Activities'] = relationship('Activities', back_populates='organizations')
 
     def __repr__(self):
         return (f'Organizations(id={self.id!r}, '
@@ -42,10 +42,10 @@ class Activities(Base):
     __tablename__ = 'Activities'
 
     names: Mapped[str] = mapped_column(String(50), nullable=False)
-    parent_id: Mapped[int] = mapped_column(nullable=False)
+    parent_id: Mapped[int] = mapped_column(ForeignKey('Activities.id'), nullable=False)
 
-    organizations: Mapped[Organizations] = relationship(back_populates='activities')
-    parent = relationship("Activity", remote_side=[id])
+    organizations: Mapped[list[Organizations]] = relationship(back_populates='activities')
+    parent: Mapped['Activities'] = relationship('Activities', remote_side=[id], backref='children')
 
     def __repr__(self):
         return (f'Activities(id={self.id!r}, '
