@@ -1,4 +1,4 @@
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, func
 
 from app.api.request_model import SearchCircle, SearchRectangle
 from app.database.database import get_database
@@ -70,6 +70,32 @@ async def get_organizations_using_coordinate(
             result = db.scalars(statement)
         return result.all()
 
+    except Exception as err:
+        db.rollback()
+        print(f'Ошибка: {err}')
+    finally:
+        db.close()
+
+
+async def get_organizations_using_id(id: int) -> list:
+    try:
+        db = next(get_database())
+        statement = select(Organizations).where(Organizations.id == id)
+        scalars_result = db.scalars(statement)
+        return scalars_result.all()
+    except Exception as err:
+        db.rollback()
+        print(f'Ошибка: {err}')
+    finally:
+        db.close()
+
+
+async def get_organizations_using_name(name: str) -> list:
+    try:
+        db = next(get_database())
+        statement = select(Organizations).where(Organizations.names == name)
+        scalars_result = db.scalars(statement)
+        return scalars_result.all()
     except Exception as err:
         db.rollback()
         print(f'Ошибка: {err}')
