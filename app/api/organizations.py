@@ -25,10 +25,10 @@ async def get_organizations_using_coordinate(
 
 
 @router.get('/organizations_using_id/{id}', tags=['Organizations'])
-async def get_organizations_using_id(id: int) -> dict:
-    ...
+async def get_organizations_using_id(id: int):
+    return await org.get_organizations_using_id(id)
 
 
 @router.get('/organizations_using_name/{name}', tags=['Organizations'])
-async def get_organizations_using_name(name: str) -> dict:
-    ...
+async def get_organizations_using_name(name: str):
+    return await org.get_organizations_using_name(name)
