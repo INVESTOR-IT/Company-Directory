@@ -24,7 +24,7 @@ class Organizations(Base):
     def __repr__(self):
         return (f'Organizations(id={self.id!r}, '
                 f'name={self.names!r}, '
-                f'house={self.houses_id!r}, '
+                f'house_id={self.houses_id!r}, '
                 f'activity={self.activities!r})')
 
 
@@ -32,8 +32,8 @@ class Houses(Base):
     __tablename__ = 'Houses'
 
     address: Mapped[str] = mapped_column(String(50), nullable=False)
-    longitude: Mapped[str] = mapped_column(Integer(), nullable=False)
-    latitude: Mapped[str] = mapped_column(Integer(), nullable=False)
+    longitude: Mapped[int] = mapped_column(Integer(), nullable=False)
+    latitude: Mapped[int] = mapped_column(Integer(), nullable=False)
 
     organizations: Mapped[list[Organizations]] = relationship(back_populates='houses')
 
