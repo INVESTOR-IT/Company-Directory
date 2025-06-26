@@ -1,40 +1,95 @@
 from sqlalchemy import select, and_, func
+from fastapi import HTTPException
+from loguru import logger
 
 from app.api.request_model import SearchCircle, SearchRectangle
 from app.database.database import get_database
 from app.database.model import Organizations, Houses, Activities
 
 
-async def get_organizations_using_house(id: int) -> list:
+async def get_organizations_using_house(id: int) -> list | HTTPException:
+    '''
+    Возвращает все организации находящиеся в данном здании
+
+    Args:
+        id: ID здания
+
+    Returns: 
+        Список всех организаций в этом здании'''
+
     try:
         db = next(get_database())
+        statement = select(Houses).where(Houses.id == id)
+        scalars_result = db.scalars(statement).all()
+
+        if not scalars_result:
+            return HTTPException(status_code=204,
+                                 detail='Данного здания нет')
+
         statement = select(Organizations).join(Houses).where(Houses.id == id)
-        scalars_result = db.scalars(statement)
-        return scalars_result.all()
+        scalars_result = db.scalars(statement).all()
+
+        if not scalars_result:
+            return HTTPException(status_code=204,
+                                 detail='Организации в здании отсутствуют')
+
+        return scalars_result
     except Exception as err:
         db.rollback()
-        print(f'Ошибка: {err}')
+        logger.error(f'Ошибка запроса в БД, {err}')
+        return HTTPException(status_code=500, detail='Ошибка запроса')
     finally:
         db.close()
 
 
-async def get_organizations_using_activity(id: int) -> list:
+async def get_organizations_using_activity(id: int) -> list | HTTPException:
+    '''
+    Возвращает все организации занимающеся данной деятельностью
+
+    Args:
+        id: ID деятельности
+
+    Returns: 
+        Список всех организаций занимающеся данной деятельностью'''
+
     try:
         db = next(get_database())
+        statement = select(Activities).where(Activities.id == id)
+        scalars_result = db.scalars(statement).all()
+
+        if not scalars_result:
+            return HTTPException(status_code=204,
+                                 detail='Данной деятельности нет')
+
         statement = (select(Organizations)
                      .join(Activities)
                      .where(Activities.id == id))
-        scalars_result = db.scalars(statement)
-        return scalars_result.all()
+        scalars_result = db.scalars(statement).all()
+
+        if not scalars_result:
+            return HTTPException(status_code=204,
+                                 detail=('Организации данной '
+                                         'деятельностью не занимаются'))
+        return scalars_result
     except Exception as err:
         db.rollback()
-        print(f'Ошибка: {err}')
+        logger.error(f'Ошибка запроса в БД, {err}')
+        return HTTPException(status_code=500, detail='Ошибка запроса')
     finally:
         db.close()
 
 
 async def get_organizations_using_coordinate(
-        cerch_params: SearchCircle | SearchRectangle) -> list:
+        cerch_params: SearchCircle | SearchRectangle) -> list | HTTPException:
+    '''
+    Возвращает все организации попавшие в область поиска круга/квадрата
+
+    Args:
+        cerch_params: SearchCircle или SearchRectangle
+
+    Returns: 
+        Список всех организаций в область поиска круга/квадрата'''
+
     try:
         db = next(get_database())
         if isinstance(cerch_params, SearchCircle):
@@ -67,37 +122,67 @@ async def get_organizations_using_coordinate(
                      and_(Houses.latitude >= limit_width[0],
                           Houses.latitude <= limit_width[1]))
             )
-            result = db.scalars(statement)
-        return result.all()
-
+            result = db.scalars(statement).all()
+        if result:
+            return result
+        return HTTPException(status_code=204,
+                             detail='В этой области нет организаций')
     except Exception as err:
         db.rollback()
-        print(f'Ошибка: {err}')
+        logger.error(f'Ошибка запроса в БД, {err}')
+        return HTTPException(status_code=500, detail='Ошибка запроса')
     finally:
         db.close()
 
 
-async def get_organizations_using_id(id: int) -> list:
+async def get_organizations_using_id(id: int) -> list | HTTPException:
+    '''
+    Возвращает организацию по указанному id 
+
+    Args:
+        id: ID орагнизации
+
+    Returns: 
+        Список организации'''
+
     try:
         db = next(get_database())
         statement = select(Organizations).where(Organizations.id == id)
-        scalars_result = db.scalars(statement)
-        return scalars_result.all()
+        scalars_result = db.scalars(statement).all()
+
+        if not scalars_result:
+            return HTTPException(status_code=204,
+                                 detail=('Нет данной организации'))
+        return scalars_result
     except Exception as err:
         db.rollback()
-        print(f'Ошибка: {err}')
+        logger.error(f'Ошибка запроса в БД, {err}')
+        return HTTPException(status_code=500, detail='Ошибка запроса')
     finally:
         db.close()
 
 
-async def get_organizations_using_name(name: str) -> list:
+async def get_organizations_using_name(name: str) -> list | HTTPException:
+    '''
+    Возвращает организацию по указанному названию
+
+    Args:
+        name: Название орагнизации
+
+    Returns: 
+        Список организации'''
     try:
         db = next(get_database())
         statement = select(Organizations).where(Organizations.names == name)
-        scalars_result = db.scalars(statement)
-        return scalars_result.all()
+        scalars_result = db.scalars(statement).all()
+
+        if not scalars_result:
+            return HTTPException(status_code=204,
+                                 detail=('Нет данной организации'))
+        return scalars_result
     except Exception as err:
         db.rollback()
-        print(f'Ошибка: {err}')
+        logger.error(f'Ошибка запроса в БД, {err}')
+        return HTTPException(status_code=500, detail='Ошибка запроса')
     finally:
         db.close()
