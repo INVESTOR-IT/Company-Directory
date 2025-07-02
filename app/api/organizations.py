@@ -87,7 +87,9 @@ async def start() -> dict:
             tags=['Organizations'],
             response_model=list[Organization])
 async def get_organizations_using_house(
-        house_id: int, session: Annotated[Session, Depends(get_database)]):
+        house_id: int,
+        session: Annotated[Session, Depends(get_database)]
+):
     return await org.get_organizations_using_house(house_id, session)
 
 
@@ -95,7 +97,9 @@ async def get_organizations_using_house(
             tags=['Organizations'],
             response_model=list[Organization])
 async def get_organizations_using_activity(
-        activity_id: int, session: Annotated[Session, Depends(get_database)]):
+        activity_id: int,
+        session: Annotated[Session, Depends(get_database)]
+):
     return await org.get_organizations_using_activity(activity_id, session)
 
 
@@ -103,7 +107,8 @@ async def get_organizations_using_activity(
             tags=['Organizations'])
 async def get_organizations_using_coordinate(
         cerch_params: Annotated[SearchCircle | SearchRectangle, Body()],
-        session: Annotated[Session, Depends(get_database)]):
+        session: Annotated[Session, Depends(get_database)]
+):
     return await org.get_organizations_using_coordinate(cerch_params, session)
 
 
@@ -111,7 +116,9 @@ async def get_organizations_using_coordinate(
             tags=['Organizations'],
             response_model=list[Organization])
 async def get_organizations_using_id(
-        id: int, session: Annotated[Session, Depends(get_database)]):
+        id: int,
+        session: Annotated[Session, Depends(get_database)]
+):
     return await org.get_organizations_using_id(id, session)
 
 
@@ -119,5 +126,7 @@ async def get_organizations_using_id(
             tags=['Organizations'],
             response_model=list[Organization])
 async def get_organizations_using_name(
-        name: str, session: Annotated[Session, Depends(get_database)]):
+        name: str,
+        session: Annotated[Session, Depends(get_database)]
+):
     return await org.get_organizations_using_name(name, session)
