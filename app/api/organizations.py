@@ -83,21 +83,23 @@ async def start() -> dict:
     return {'message': 'Все готово, БД пополнилась!'}
 
 
-@router.get('/organizations_using_house/{house_id}', 
-            tags=['Organizations'], response_model=list[Organization])
+@router.get(path='/organizations_using_house/{house_id}',
+            tags=['Organizations'],
+            response_model=list[Organization])
 async def get_organizations_using_house(
         house_id: int, session: Annotated[Session, Depends(get_database)]):
     return await org.get_organizations_using_house(house_id, session)
 
 
-@router.get('/organizations_using_activity/{activity_id}',
-            tags=['Organizations'], response_model=list[Organization])
+@router.get(path='/organizations_using_activity/{activity_id}',
+            tags=['Organizations'],
+            response_model=list[Organization])
 async def get_organizations_using_activity(
         activity_id: int, session: Annotated[Session, Depends(get_database)]):
     return await org.get_organizations_using_activity(activity_id, session)
 
 
-@router.get('/organizations_using_coordinate/', 
+@router.get(path='/organizations_using_coordinate/',
             tags=['Organizations'])
 async def get_organizations_using_coordinate(
         cerch_params: Annotated[SearchCircle | SearchRectangle, Body()],
@@ -105,15 +107,17 @@ async def get_organizations_using_coordinate(
     return await org.get_organizations_using_coordinate(cerch_params, session)
 
 
-@router.get('/organizations_using_id/{id}', 
-            tags=['Organizations'], response_model=list[Organization])
+@router.get(path='/organizations_using_id/{id}',
+            tags=['Organizations'],
+            response_model=list[Organization])
 async def get_organizations_using_id(
         id: int, session: Annotated[Session, Depends(get_database)]):
     return await org.get_organizations_using_id(id, session)
 
 
-@router.get('/organizations_using_name/{name}', 
-            tags=['Organizations'], response_model=list[Organization])
+@router.get(path='/organizations_using_name/{name}',
+            tags=['Organizations'],
+            response_model=list[Organization])
 async def get_organizations_using_name(
         name: str, session: Annotated[Session, Depends(get_database)]):
     return await org.get_organizations_using_name(name, session)
