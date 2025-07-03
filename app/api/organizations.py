@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, Depends, Response
+from fastapi import APIRouter, Body, Depends, Request, Response
 from typing import Annotated
 from sqlalchemy.orm import Session
 
@@ -8,6 +8,7 @@ from app.api.request_model import SearchCircle, SearchRectangle
 from app.api.response_model import Organization
 from app.database.database import get_database
 from app.database.model import Organizations, Houses, Activities
+from app.services.exceptions import APIError, NotFoundError
 
 router = APIRouter()
 
@@ -90,7 +91,10 @@ async def get_organizations_using_house(
         house_id: int,
         session: Annotated[Session, Depends(get_database)]
 ):
-    return await org.get_organizations_using_house(house_id, session)
+    result = await org.get_organizations_using_house(house_id, session)
+    if isinstance(result, APIError):
+        raise result
+    return result
 
 
 @router.get(path='/organizations_using_activity/{activity_id}',
@@ -100,7 +104,10 @@ async def get_organizations_using_activity(
         activity_id: int,
         session: Annotated[Session, Depends(get_database)]
 ):
-    return await org.get_organizations_using_activity(activity_id, session)
+    result = await org.get_organizations_using_activity(activity_id, session)
+    if isinstance(result, APIError):
+        raise result
+    return result
 
 
 @router.get(path='/organizations_using_coordinate/',
@@ -109,7 +116,10 @@ async def get_organizations_using_coordinate(
         cerch_params: Annotated[SearchCircle | SearchRectangle, Body()],
         session: Annotated[Session, Depends(get_database)]
 ):
-    return await org.get_organizations_using_coordinate(cerch_params, session)
+    result = await org.get_organizations_using_coordinate(cerch_params, session)
+    if isinstance(result, APIError):
+        raise result
+    return result
 
 
 @router.get(path='/organizations_using_id/{id}',
@@ -119,7 +129,10 @@ async def get_organizations_using_id(
         id: int,
         session: Annotated[Session, Depends(get_database)]
 ):
-    return await org.get_organizations_using_id(id, session)
+    result = await org.get_organizations_using_id(id, session)
+    if isinstance(result, APIError):
+        raise result
+    return result
 
 
 @router.get(path='/organizations_using_name/{name}',
@@ -129,4 +142,7 @@ async def get_organizations_using_name(
         name: str,
         session: Annotated[Session, Depends(get_database)]
 ):
-    return await org.get_organizations_using_name(name, session)
+    result = await org.get_organizations_using_name(name, session)
+    if isinstance(result, APIError):
+        raise result
+    return result

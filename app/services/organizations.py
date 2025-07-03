@@ -4,8 +4,8 @@ from fastapi import HTTPException
 from loguru import logger
 
 from app.api.request_model import SearchCircle, SearchRectangle
-from app.database.database import get_database
 from app.database.model import Organizations, Houses, Activities
+from app.services.exceptions import NotFoundError
 
 
 async def get_organizations_using_house(id: int, session: Session) -> list:
@@ -14,16 +14,10 @@ async def get_organizations_using_house(id: int, session: Session) -> list:
         scalars_result = session.scalars(statement).all()
 
         if not scalars_result:
-            return HTTPException(status_code=204,
-                                 detail='Данного здания нет')
+            return NotFoundError(message='Данного здания нет')
 
         statement = select(Organizations).join(Houses).where(Houses.id == id)
         scalars_result = session.scalars(statement).all()
-
-        if not scalars_result:
-            return HTTPException(status_code=204,
-                                 detail='Организации в здании отсутствуют')
-
         return scalars_result
     except Exception as err:
         session.rollback()
@@ -39,18 +33,12 @@ async def get_organizations_using_activity(id: int, session: Session) -> list:
         scalars_result = session.scalars(statement).all()
 
         if not scalars_result:
-            return HTTPException(status_code=204,
-                                 detail='Данной деятельности нет')
+            return NotFoundError(message='Данной деятельности нет')
 
         statement = (select(Organizations)
                      .join(Activities)
                      .where(Activities.id == id))
         scalars_result = session.scalars(statement).all()
-
-        if not scalars_result:
-            return HTTPException(status_code=204,
-                                 detail=('Организации данной '
-                                         'деятельностью не занимаются'))
         return scalars_result
     except Exception as err:
         session.rollback()
@@ -94,10 +82,7 @@ async def get_organizations_using_coordinate(
                           Houses.latitude <= limit_width[1]))
             )
             result = session.scalars(statement).all()
-        if result:
-            return result
-        return HTTPException(status_code=204,
-                             detail='В этой области нет организаций')
+        return result
     except Exception as err:
         session.rollback()
         logger.error(f'Ошибка запроса в БД, {err}')
@@ -112,8 +97,7 @@ async def get_organizations_using_id(id: int, session: Session) -> list:
         scalars_result = session.scalars(statement).all()
 
         if not scalars_result:
-            return HTTPException(status_code=204,
-                                 detail=('Нет данной организации'))
+            return NotFoundError(message='Нет данной организации')
         return scalars_result
     except Exception as err:
         session.rollback()
@@ -129,8 +113,7 @@ async def get_organizations_using_name(name: str, session: Session) -> list:
         scalars_result = session.scalars(statement).all()
 
         if not scalars_result:
-            return HTTPException(status_code=204,
-                                 detail=('Нет данной организации'))
+            return NotFoundError(message='Нет данной организации')
         return scalars_result
     except Exception as err:
         session.rollback()
