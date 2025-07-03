@@ -9,22 +9,16 @@ from app.services.exceptions import NotFoundError
 
 
 async def get_organizations_using_house(id: int, session: Session) -> list:
-    try:
-        statement = select(Houses).where(Houses.id == id)
-        scalars_result = session.scalars(statement).all()
+    statement = select(Houses).where(Houses.id == id)
+    scalars_result = session.scalars(statement).all()
 
-        if not scalars_result:
-            return NotFoundError(message='Данного здания нет')
+    if not scalars_result:
+        return NotFoundError(message='Данного здания нет')
 
-        statement = select(Organizations).join(Houses).where(Houses.id == id)
-        scalars_result = session.scalars(statement).all()
-        return scalars_result
-    except Exception as err:
-        session.rollback()
-        logger.error(f'Ошибка запроса в БД, {err}')
-        return HTTPException(status_code=500, detail='Ошибка запроса')
-    finally:
-        session.close()
+    statement = select(Organizations).join(Houses).where(Houses.id == id)
+    scalars_result = session.scalars(statement).all()
+    return scalars_result
+    
 
 
 async def get_organizations_using_activity(id: int, session: Session) -> list:
