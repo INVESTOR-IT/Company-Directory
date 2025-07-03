@@ -5,7 +5,7 @@ from loguru import logger
 
 from app.api.request_model import SearchCircle, SearchRectangle
 from app.database.model import Organizations, Houses, Activities
-from app.services.exceptions import NotFoundError
+from app.services.exceptions import NotFoundError, APIError
 
 
 async def get_organizations_using_house(id: int, session: Session) -> list:
@@ -37,7 +37,7 @@ async def get_organizations_using_activity(id: int, session: Session) -> list:
     except Exception as err:
         session.rollback()
         logger.error(f'Ошибка запроса в БД, {err}')
-        return HTTPException(status_code=500, detail='Ошибка запроса')
+        return APIError
     finally:
         session.close()
 
@@ -80,7 +80,7 @@ async def get_organizations_using_coordinate(
     except Exception as err:
         session.rollback()
         logger.error(f'Ошибка запроса в БД, {err}')
-        return HTTPException(status_code=500, detail='Ошибка запроса')
+        return APIError
     finally:
         session.close()
 
@@ -96,7 +96,7 @@ async def get_organizations_using_id(id: int, session: Session) -> list:
     except Exception as err:
         session.rollback()
         logger.error(f'Ошибка запроса в БД, {err}')
-        return HTTPException(status_code=500, detail='Ошибка запроса')
+        return APIError
     finally:
         session.close()
 
@@ -112,6 +112,6 @@ async def get_organizations_using_name(name: str, session: Session) -> list:
     except Exception as err:
         session.rollback()
         logger.error(f'Ошибка запроса в БД, {err}')
-        return HTTPException(status_code=500, detail='Ошибка запроса')
+        return APIError
     finally:
         session.close()
