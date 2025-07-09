@@ -18,7 +18,6 @@ async def get_organizations_using_house(id: int, session: Session) -> list:
     statement = select(Organizations).join(Houses).where(Houses.id == id)
     scalars_result = session.scalars(statement).all()
     return scalars_result
-    
 
 
 async def get_organizations_using_activity(id: int, session: Session) -> list:
@@ -46,23 +45,11 @@ async def get_organizations_using_coordinate(
         cerch_params: SearchCircle | SearchRectangle, session: Session) -> list:
     try:
         if isinstance(cerch_params, SearchCircle):
-            result = []
-            limit_height = (cerch_params.longitude - cerch_params.radius,
-                            cerch_params.longitude + cerch_params.radius)
-            limit_width = (cerch_params.latitude - cerch_params.radius,
-                           cerch_params.latitude + cerch_params.radius)
-            statement = select(Houses).where(
-                and_(and_(Houses.longitude >= limit_height[0],
-                          Houses.longitude <= limit_height[1]),
-                     and_(Houses.latitude >= limit_width[0],
-                          Houses.latitude <= limit_width[1]))
-            )
-            scalars_result = session.scalars(statement)
-            for house in scalars_result:
-                if cerch_params.radius >= (
-                    (house.longitude - cerch_params.longitude) ** 2
-                        + (house.latitude - cerch_params.latitude) ** 2) ** 0.5:
-                    result.append(house)
+            statement = select(Organizations).join(Houses).where(
+                cerch_params.radius >= func.pow(
+                    func.pow(Houses.longitude - cerch_params.longitude, 2) +
+                    func.pow(Houses.latitude - cerch_params.latitude, 2), 0.5))
+            scalars_result = session.scalars(statement).all()
         else:
             limit_height = (cerch_params.longitude - cerch_params.height,
                             cerch_params.longitude + cerch_params.height)
@@ -75,8 +62,8 @@ async def get_organizations_using_coordinate(
                      and_(Houses.latitude >= limit_width[0],
                           Houses.latitude <= limit_width[1]))
             )
-            result = session.scalars(statement).all()
-        return result
+            scalars_result = session.scalars(statement).all()
+        return scalars_result
     except Exception as err:
         session.rollback()
         logger.error(f'Ошибка запроса в БД, {err}')
@@ -103,7 +90,8 @@ async def get_organizations_using_id(id: int, session: Session) -> list:
 
 async def get_organizations_using_name(name: str, session: Session) -> list:
     try:
-        statement = select(Organizations).where(Organizations.names == name)
+        statement = select(Organizations).where(func.lower(Organizations.names)
+                                                .like(f'%{name.lower()}%'))
         scalars_result = session.scalars(statement).all()
 
         if not scalars_result:
