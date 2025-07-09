@@ -56,7 +56,7 @@ async def get_organizations_using_coordinate(
             limit_width = (cerch_params.latitude - cerch_params.width,
                            cerch_params.latitude + cerch_params.width)
 
-            statement = select(Houses).where(
+            statement = select(Organizations).join(Houses).where(
                 and_(and_(Houses.longitude >= limit_height[0],
                           Houses.longitude <= limit_height[1]),
                      and_(Houses.latitude >= limit_width[0],
