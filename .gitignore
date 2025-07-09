@@ -49,7 +49,6 @@ pip-log.txt
 pip.log
 
 # Docker
-.dockerignore
 pgdata/
 
 # Environment Variables
