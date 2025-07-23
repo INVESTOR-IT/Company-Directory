@@ -1,23 +1,27 @@
 from sqlalchemy import select, and_, func
 from sqlalchemy.orm import Session
-from fastapi import HTTPException
 from loguru import logger
 
 from app.api.request_model import SearchCircle, SearchRectangle
 from app.database.model import Organizations, Houses, Activities
-from app.services.exceptions import NotFoundError, APIError
 
 
 async def get_organizations_using_house(id: int, session: Session) -> list:
-    statement = select(Houses).where(Houses.id == id)
-    scalars_result = session.scalars(statement).all()
+    try:
+        statement = select(Houses).where(Houses.id == id)
+        scalars_result = session.scalars(statement).all()
 
-    if not scalars_result:
-        return NotFoundError(message='Данного здания нет')
+        if not scalars_result:
+            return None
 
-    statement = select(Organizations).join(Houses).where(Houses.id == id)
-    scalars_result = session.scalars(statement).all()
-    return scalars_result
+        statement = select(Organizations).join(Houses).where(Houses.id == id)
+        scalars_result = session.scalars(statement).all()
+        return scalars_result
+    except Exception as err:
+        session.rollback()
+        logger.error(f'Ошибка запроса в БД, {err}')
+    finally:
+        session.close()
 
 
 async def get_organizations_using_activity(id: int, session: Session) -> list:
@@ -26,7 +30,7 @@ async def get_organizations_using_activity(id: int, session: Session) -> list:
         scalars_result = session.scalars(statement).all()
 
         if not scalars_result:
-            return NotFoundError(message='Данной деятельности нет')
+            return None
 
         statement = (select(Organizations)
                      .join(Activities)
@@ -36,7 +40,6 @@ async def get_organizations_using_activity(id: int, session: Session) -> list:
     except Exception as err:
         session.rollback()
         logger.error(f'Ошибка запроса в БД, {err}')
-        return APIError
     finally:
         session.close()
 
@@ -67,7 +70,6 @@ async def get_organizations_using_coordinate(
     except Exception as err:
         session.rollback()
         logger.error(f'Ошибка запроса в БД, {err}')
-        return APIError
     finally:
         session.close()
 
@@ -78,12 +80,11 @@ async def get_organizations_using_id(id: int, session: Session) -> list:
         scalars_result = session.scalars(statement).all()
 
         if not scalars_result:
-            return NotFoundError(message='Нет данной организации')
+            return None
         return scalars_result
     except Exception as err:
         session.rollback()
         logger.error(f'Ошибка запроса в БД, {err}')
-        return APIError
     finally:
         session.close()
 
@@ -95,11 +96,10 @@ async def get_organizations_using_name(name: str, session: Session) -> list:
         scalars_result = session.scalars(statement).all()
 
         if not scalars_result:
-            return NotFoundError(message='Нет данной организации')
+            return None
         return scalars_result
     except Exception as err:
         session.rollback()
         logger.error(f'Ошибка запроса в БД, {err}')
-        return APIError
     finally:
         session.close()
