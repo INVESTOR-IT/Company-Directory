@@ -68,3 +68,7 @@ ehthumbs.db
 
 # Custom additions (add any project-specific files you want to ignore)
 # example: /output/
+
+
+# Temporary Python files
+exceptions.py
