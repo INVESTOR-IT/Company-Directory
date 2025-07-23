@@ -9,7 +9,7 @@ class Base(DeclarativeBase):
 class Organizations(Base):
     __tablename__ = 'Organizations'
 
-    names: Mapped[str] = mapped_column(String(50), nullable=False)
+    name: Mapped[str] = mapped_column(String(50), nullable=False)
     phones: Mapped[str] = mapped_column(String(75), nullable=False)
     houses_id: Mapped[int] = mapped_column(ForeignKey('Houses.id'),
                                            nullable=False)
@@ -23,7 +23,7 @@ class Organizations(Base):
 
     def __repr__(self):
         return (f'Organizations(id={self.id!r}, '
-                f'name={self.names!r}, '
+                f'name={self.name!r}, '
                 f'house_id={self.houses_id!r}, '
                 f'activity={self.activities!r})')
 
@@ -48,7 +48,7 @@ class Activities(Base):
     __tablename__ = 'Activities'
 
     id: Mapped[int] = mapped_column(autoincrement=True, primary_key=True)
-    names: Mapped[str] = mapped_column(String(50), nullable=False)
+    name: Mapped[str] = mapped_column(String(50), nullable=False)
     parent_id: Mapped[int] = mapped_column(ForeignKey('Activities.id'),
                                            nullable=True)
 
@@ -58,5 +58,5 @@ class Activities(Base):
 
     def __repr__(self):
         return (f'Activities(id={self.id!r}, '
-                f'name={self.names!r}, '
+                f'name={self.name!r}, '
                 f'parent_id={self.parent_id!r})')

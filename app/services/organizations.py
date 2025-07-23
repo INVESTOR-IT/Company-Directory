@@ -16,6 +16,8 @@ async def get_organizations_using_house(id: int, session: Session) -> list | Non
 
         statement = select(Organizations).join(Houses).where(Houses.id == id)
         scalars_result = (await session.scalars(statement)).all()
+        for result in scalars_result:
+            result.phones = result.phones.split(';')
         return scalars_result
     except Exception as err:
         logger.error(f'Ошибка запроса в БД, {err}', exc_info=True)
@@ -35,6 +37,8 @@ async def get_organizations_using_activity(id: int, session: Session) -> list:
         statement = (select(Organizations).join(Activities)
                      .where(Activities.id == id))
         scalars_result = (await session.scalars(statement)).all()
+        for result in scalars_result:
+            result.phones = result.phones.split(';')
         return scalars_result
     except Exception as err:
         logger.error(f'Ошибка запроса в БД, {err}', exc_info=True)
@@ -65,6 +69,8 @@ async def get_organizations_using_coordinate(
                           Houses.latitude <= limit_width[1]))
             )
             scalars_result = (await session.scalars(statement)).all()
+        for result in scalars_result:
+            result.phones = result.phones.split(';')
         return scalars_result
     except Exception as err:
         logger.error(f'Ошибка запроса в БД, {err}', exc_info=True)
@@ -79,6 +85,8 @@ async def get_organizations_using_id(id: int, session: Session) -> list:
         scalars_result = (await session.scalars(statement)).all()
         if not scalars_result:
             return None
+        for result in scalars_result:
+            result.phones = result.phones.split(';')
         return scalars_result
     except Exception as err:
         logger.error(f'Ошибка запроса в БД, {err}', exc_info=True)
@@ -89,12 +97,14 @@ async def get_organizations_using_id(id: int, session: Session) -> list:
 
 async def get_organizations_using_name(name: str, session: Session) -> list:
     try:
-        statement = select(Organizations).where(func.lower(Organizations.names)
+        statement = select(Organizations).where(func.lower(Organizations.name)
                                                 .like(f'%{name.lower()}%'))
         scalars_result = (await session.scalars(statement)).all()
 
         if not scalars_result:
             return None
+        for result in scalars_result:
+            result.phones = result.phones.split(';')
         return scalars_result
     except Exception as err:
         logger.error(f'Ошибка запроса в БД, {err}', exc_info=True)
