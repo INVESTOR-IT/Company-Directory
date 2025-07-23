@@ -6,42 +6,41 @@ from app.api.request_model import SearchCircle, SearchRectangle
 from app.database.model import Organizations, Houses, Activities
 
 
-async def get_organizations_using_house(id: int, session: Session) -> list:
+async def get_organizations_using_house(id: int, session: Session) -> list | None:
     try:
         statement = select(Houses).where(Houses.id == id)
-        scalars_result = session.scalars(statement).all()
+        scalars_result = (await session.scalars(statement)).all()
 
         if not scalars_result:
             return None
 
         statement = select(Organizations).join(Houses).where(Houses.id == id)
-        scalars_result = session.scalars(statement).all()
+        scalars_result = (await session.scalars(statement)).all()
         return scalars_result
     except Exception as err:
-        session.rollback()
-        logger.error(f'Ошибка запроса в БД, {err}')
+        logger.error(f'Ошибка запроса в БД, {err}', exc_info=True)
+        await session.rollback()
     finally:
-        session.close()
+        await session.close()
 
 
 async def get_organizations_using_activity(id: int, session: Session) -> list:
     try:
         statement = select(Activities).where(Activities.id == id)
-        scalars_result = session.scalars(statement).all()
+        scalars_result = (await session.scalars(statement)).all()
 
         if not scalars_result:
             return None
 
-        statement = (select(Organizations)
-                     .join(Activities)
+        statement = (select(Organizations).join(Activities)
                      .where(Activities.id == id))
-        scalars_result = session.scalars(statement).all()
+        scalars_result = (await session.scalars(statement)).all()
         return scalars_result
     except Exception as err:
-        session.rollback()
-        logger.error(f'Ошибка запроса в БД, {err}')
+        logger.error(f'Ошибка запроса в БД, {err}', exc_info=True)
+        await session.rollback()
     finally:
-        session.close()
+        await session.close()
 
 
 async def get_organizations_using_coordinate(
@@ -52,7 +51,7 @@ async def get_organizations_using_coordinate(
                 cerch_params.radius >= func.pow(
                     func.pow(Houses.longitude - cerch_params.longitude, 2) +
                     func.pow(Houses.latitude - cerch_params.latitude, 2), 0.5))
-            scalars_result = session.scalars(statement).all()
+            scalars_result = (await session.scalars(statement)).all()
         else:
             limit_height = (cerch_params.longitude - cerch_params.height,
                             cerch_params.longitude + cerch_params.height)
@@ -65,41 +64,40 @@ async def get_organizations_using_coordinate(
                      and_(Houses.latitude >= limit_width[0],
                           Houses.latitude <= limit_width[1]))
             )
-            scalars_result = session.scalars(statement).all()
+            scalars_result = (await session.scalars(statement)).all()
         return scalars_result
     except Exception as err:
-        session.rollback()
-        logger.error(f'Ошибка запроса в БД, {err}')
+        logger.error(f'Ошибка запроса в БД, {err}', exc_info=True)
+        await session.rollback()
     finally:
-        session.close()
+        await session.close()
 
 
 async def get_organizations_using_id(id: int, session: Session) -> list:
     try:
         statement = select(Organizations).where(Organizations.id == id)
-        scalars_result = session.scalars(statement).all()
-
+        scalars_result = (await session.scalars(statement)).all()
         if not scalars_result:
             return None
         return scalars_result
     except Exception as err:
-        session.rollback()
-        logger.error(f'Ошибка запроса в БД, {err}')
+        logger.error(f'Ошибка запроса в БД, {err}', exc_info=True)
+        await session.rollback()
     finally:
-        session.close()
+        await session.close()
 
 
 async def get_organizations_using_name(name: str, session: Session) -> list:
     try:
         statement = select(Organizations).where(func.lower(Organizations.names)
                                                 .like(f'%{name.lower()}%'))
-        scalars_result = session.scalars(statement).all()
+        scalars_result = (await session.scalars(statement)).all()
 
         if not scalars_result:
             return None
         return scalars_result
     except Exception as err:
-        session.rollback()
-        logger.error(f'Ошибка запроса в БД, {err}')
+        logger.error(f'Ошибка запроса в БД, {err}', exc_info=True)
+        await session.rollback()
     finally:
-        session.close()
+        await session.close()
