@@ -1,27 +1,66 @@
-<h1 align="center"> Company-Directory </h1>
+<h1 align="center"> 
+    Company-Directory
+</h1>
 
-**Deploy:**<br>
+<div align="center">
+    <img src="https://img.shields.io/badge/Python-3.11-blue">
+    <img src="https://img.shields.io/badge/Version-v1.0_(Alpha)-green">
+    <img src="https://img.shields.io/badge/License-MIT-red">
+</div>
+
+</br>
+
+## Описание
+Сервис реализован для записи и хранение в PostgreSQL данные в виде оргеназиций,
+которые имеют вид деятельности и здание, в котором они находятся
+Сервис позволяет создать организацию и присвоить ей вид деятельности и здание
+
+</br>
+
+## Документация 
+### Структура проекта
+```
+├── app
+│   ├── api
+│   │   ├── organizations.py         # Эндпоинты авторизации
+│   │   ├── request_model.py         # Эндпоинты авторизации
+│   │   └── response_model.py        # Логика сервиса авторизации
+│   ├── database
+│   │   ├── database.py              # Инициализация БД
+│   │   └── model.py                 # Модель БД
+│   ├── services
+│   │   └── organizations.py         # Логика сервиса
+│   ├── config.py                    # Settings для приложения
+│   └── main.py                      # Главный файл
+├── .env.example                     # Пример файла переменных окружения
+├── .gitignore                       # Игнорирование для git
+├── .dockerignore                    # Игнорирование для Docker
+├── Dockerfile                       # Dockerfile для API сервиса
+├── requirements.txt                 # Зависимости Python
+└── README.md                        # Документация проекта
+```
+
+</br>
+
+### Deploy
 Перед запуском в .env копируем `URL_DATABSE` из .env.example<br>
 `docker-compose up --build`
 
----
+Для пополнения БД тест данными
+- GET `http://localhost:8000/start` - временный эндпоинт для пополнения тестовыми данными БД
 
-**Docker-compose**<br>
-В `docker-compose.yaml` установлен порт 5433 для предотвращения конфликта с БД на машине
+</br>
 
----
-**Для пополнения БД тест данными**<br>
-`http://localhost:8000/start` - временный эндпоинт
-
-<br>
-
-**Для проверки эндпоинтов**<br>
-`http://localhost:8000/organizations_using_house/1`<br>
-`http://localhost:8000/organizations_using_activity/1`<br>
-`http://localhost:8000/organizations_using_id/1`<br>
-`http://localhost:8000/organizations_using_name/Рено`<br>
-
-Для эндпоинта `http://localhost:8000/organizations_using_coordinate` используем JSON тело
+### Эндпоинты
+#### Root
+- GET `http://localhost:8000` - Документация OpenAPI
+#### Organizations
+- GET `http://localhost:8000/organizations_using_house/` - Список организаций в здании
+- GET `http://localhost:8000/organizations_using_activity/` - Список организаций с определенным вид деятельности
+- GET `http://localhost:8000/organizations_using_id/` - Организации с определенным индификатором
+- GET `http://localhost:8000/organizations_using_name/` - Список организаций по название организиции
+- GET `http://localhost:8000/organizations_using_coordinate` - Список организации в области поиска
+Поиск осуществляется квадратом (1 вариант) или кругом, параметры передаем Json теле
 ```
 {
     "longitude": 50,
@@ -39,10 +78,9 @@
 }
 ```
 
----
+</br>
 
-Визуальная часть тестовых данных в БД<br>
-
+Визуальная часть тестовых данных в БД</br>
 **Organizations**
 | id | names         | phones                    | hauses_id | activites_id |
 | -  | -             | -                         | -         | -            |
@@ -74,3 +112,6 @@
 | 6  | Грузовые           | 2        |
 | 7  | Запчасти           | 5        |
 | 8  | Аксесуары          | 5        |
+
+## Лицензия 
+Проект распростроняется под лецензией MIT
