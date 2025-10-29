@@ -57,10 +57,10 @@ docker-compose up --build
 #### Root
 - GET `http://localhost:8000` - Документация OpenAPI
 #### Organizations
-- GET `http://localhost:8000/organizations_using_house/` - Список организаций в здании
-- GET `http://localhost:8000/organizations_using_activity/` - Список организаций с определенным вид деятельности
-- GET `http://localhost:8000/organizations_using_id/` - Организации с определенным индификатором
-- GET `http://localhost:8000/organizations_using_name/` - Список организаций по название организиции
+- GET `http://localhost:8000/organizations_using_house` - Список организаций в здании
+- GET `http://localhost:8000/organizations_using_activity` - Список организаций с определенным вид деятельности
+- GET `http://localhost:8000/organizations_using_id` - Организации с определенным индификатором
+- GET `http://localhost:8000/organizations_using_name` - Список организаций по название организиции
 - GET `http://localhost:8000/organizations_using_coordinate` - Список организации в области поиска
 Поиск осуществляется квадратом (1 вариант) или кругом (2 вариант), параметры передаем Json теле
 ```
