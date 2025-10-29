@@ -16,19 +16,20 @@ services:
     networks:
       - app-network
   app:
-      build: .
-      ports:
-        - "8000:8000"
-      environment:
-        DATABASE_URL: ${URL_DATABASE}
-      depends_on:
-        postgres:
-          condition: service_healthy
-      networks:
-        - app-network
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: ${URL_DATABASE}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
+
 
 networks:
   app-network:

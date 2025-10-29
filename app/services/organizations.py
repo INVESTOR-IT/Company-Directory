@@ -6,7 +6,14 @@ from app.api.request_model import SearchCircle, SearchRectangle
 from app.database.model import Organizations, Houses, Activities
 
 
-async def get_organizations_using_house(id: int, session: Session) -> list | None:
+async def get_organizations_using_house(
+        id: int,
+        session: Session
+) -> list[Organizations] | None:
+    '''
+    Функция возвращает список организаций находящиеся в одном здании
+    '''
+
     try:
         statement = select(Houses).where(Houses.id == id)
         scalars_result = (await session.scalars(statement)).all()
@@ -22,11 +29,17 @@ async def get_organizations_using_house(id: int, session: Session) -> list | Non
     except Exception as err:
         logger.error(f'Ошибка запроса в БД, {err}', exc_info=True)
         await session.rollback()
-    finally:
-        await session.close()
 
 
-async def get_organizations_using_activity(id: int, session: Session) -> list:
+async def get_organizations_using_activity(
+        id: int,
+        session: Session
+) -> list[Organizations]:
+    '''
+    Функция возвращает список организаций 
+    занимающейся определенной деятельностью
+    '''
+
     try:
         statement = select(Activities).where(Activities.id == id)
         scalars_result = (await session.scalars(statement)).all()
@@ -43,12 +56,16 @@ async def get_organizations_using_activity(id: int, session: Session) -> list:
     except Exception as err:
         logger.error(f'Ошибка запроса в БД, {err}', exc_info=True)
         await session.rollback()
-    finally:
-        await session.close()
 
 
 async def get_organizations_using_coordinate(
-        cerch_params: SearchCircle | SearchRectangle, session: Session) -> list:
+        cerch_params: SearchCircle | SearchRectangle,
+        session: Session
+) -> list[Organizations]:
+    '''
+    Функция возвращает список организаций находящиеся в области поиска
+    '''
+
     try:
         if isinstance(cerch_params, SearchCircle):
             statement = select(Organizations).join(Houses).where(
@@ -75,11 +92,16 @@ async def get_organizations_using_coordinate(
     except Exception as err:
         logger.error(f'Ошибка запроса в БД, {err}', exc_info=True)
         await session.rollback()
-    finally:
-        await session.close()
 
 
-async def get_organizations_using_id(id: int, session: Session) -> list:
+async def get_organizations_using_id(
+        id: int,
+        session: Session
+) -> Organizations:
+    '''
+    Функция возвращает организцацию по индификатору 
+    '''
+
     try:
         statement = select(Organizations).where(Organizations.id == id)
         scalars_result = (await session.scalars(statement)).all()
@@ -91,11 +113,16 @@ async def get_organizations_using_id(id: int, session: Session) -> list:
     except Exception as err:
         logger.error(f'Ошибка запроса в БД, {err}', exc_info=True)
         await session.rollback()
-    finally:
-        await session.close()
 
 
-async def get_organizations_using_name(name: str, session: Session) -> list:
+async def get_organizations_using_name(
+        name: str,
+        session: Session
+) -> list[Organizations]:
+    '''
+    Функция возвращает список организаций по нававанию
+    '''
+
     try:
         statement = select(Organizations).where(func.lower(Organizations.name)
                                                 .like(f'%{name.lower()}%'))
@@ -109,5 +136,3 @@ async def get_organizations_using_name(name: str, session: Session) -> list:
     except Exception as err:
         logger.error(f'Ошибка запроса в БД, {err}', exc_info=True)
         await session.rollback()
-    finally:
-        await session.close()
