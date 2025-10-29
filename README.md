@@ -44,7 +44,9 @@
 
 ### Deploy
 Перед запуском в .env копируем `URL_DATABSE` из .env.example<br>
-```docker-compose up --build```
+```
+docker-compose up --build
+```
 
 Для пополнения БД тест данными
 - GET `http://localhost:8000/start` - временный эндпоинт для пополнения тестовыми данными БД
