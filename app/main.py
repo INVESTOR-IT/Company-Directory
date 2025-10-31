@@ -17,7 +17,6 @@ async def lifespan(app: FastAPI):
         logger.info('База данных инициализирована')
     except Exception as err:
         logger.error(f'Не удалось инициализировать базу данных: {err}')
-        raise
     yield
     logger.info('Завершение работы сервера')
 

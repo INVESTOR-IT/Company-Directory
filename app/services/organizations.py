@@ -1,5 +1,5 @@
 from sqlalchemy import select, and_, func
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from loguru import logger
 
 from app.api.request_model import SearchCircle, SearchRectangle
@@ -8,7 +8,7 @@ from app.database.model import Organizations, Houses, Activities
 
 async def get_organizations_using_house(
         id: int,
-        session: Session
+        session: AsyncSession
 ) -> list[Organizations] | None:
     '''
     Функция возвращает список организаций находящиеся в одном здании
@@ -33,7 +33,7 @@ async def get_organizations_using_house(
 
 async def get_organizations_using_activity(
         id: int,
-        session: Session
+        session: AsyncSession
 ) -> list[Organizations]:
     '''
     Функция возвращает список организаций 
@@ -60,7 +60,7 @@ async def get_organizations_using_activity(
 
 async def get_organizations_using_coordinate(
         cerch_params: SearchCircle | SearchRectangle,
-        session: Session
+        session: AsyncSession
 ) -> list[Organizations]:
     '''
     Функция возвращает список организаций находящиеся в области поиска
@@ -96,7 +96,7 @@ async def get_organizations_using_coordinate(
 
 async def get_organizations_using_id(
         id: int,
-        session: Session
+        session: AsyncSession
 ) -> Organizations:
     '''
     Функция возвращает организцацию по индификатору 
@@ -117,7 +117,7 @@ async def get_organizations_using_id(
 
 async def get_organizations_using_name(
         name: str,
-        session: Session
+        session: AsyncSession
 ) -> list[Organizations]:
     '''
     Функция возвращает список организаций по нававанию
