@@ -37,7 +37,7 @@ async def get_organizations_using_activity(
     return result
 
 
-@router.get(path='/organizations_using_coordinate',
+@router.post(path='/organizations_using_coordinate',
             tags=['Organizations'])
 async def get_organizations_using_coordinate(
         cerch_params: Annotated[SearchCircle | SearchRectangle, Body()],
